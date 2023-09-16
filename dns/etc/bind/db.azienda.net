@@ -1,0 +1,24 @@
+$ORIGIN azienda.net.
+$TTL 2d
+azienda.net. IN SOA ns.azienda.net. hostmaster.azienda.net. (
+  20200906 ; serial
+  28 ; refresh
+  14 ; retry
+  3600000 ; expire
+  0 ; negative cache ttl
+)
+
+; NS RECORD
+azienda.net. IN NS ns.azienda.net.
+
+; A RECORD
+router.azienda.net.       IN A 172.16.0.1
+ssh.azienda.net.          IN A 172.16.0.10
+printer.azienda.net.      IN A 172.16.0.11
+tv.azienda.net.           IN A 172.16.0.12
+ns.azienda.net.           IN A 172.16.6.10
+ws1.azienda.net.          IN A 172.16.6.11
+ws2.azienda.net.          IN A 172.16.6.12
+www.azienda.net.          IN A 172.16.6.11
+www.azienda.net.          IN A 172.16.6.12
+ca.azienda.net.           IN CNAME router.azienda.net.

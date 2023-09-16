@@ -1,0 +1,6 @@
+
+# Set interface up
+ip link set dev eth0 up
+
+# Ask for ip address
+dhclient eth0

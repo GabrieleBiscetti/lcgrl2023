@@ -1,0 +1,9 @@
+
+# Set interface up
+ip link set dev eth0 up
+
+# Ask for ip address
+dhclient eth0
+
+# Set right permission to ssh keys
+chmod -R 700 /root/.ssh/

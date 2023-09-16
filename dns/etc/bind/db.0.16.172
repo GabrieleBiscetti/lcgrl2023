@@ -1,0 +1,15 @@
+$ORIGIN 0.16.172.in-addr.arpa.
+$TTL 604800
+@ IN SOA 0.16.172.in-addr.arpa. hostmaster.azienda.net. (
+  1 ; serial
+  604800 ; refresh
+  86400 ; retry
+  2419200 ; expire
+  604800 ; negative cache ttl
+)
+
+@     IN NS  ns.azienda.net.
+1     IN PTR router.azienda.net.
+10    IN PTR ssh.azienda.net.
+11    IN PTR printer.azienda.net.
+12    IN PTR tv.azienda.net.

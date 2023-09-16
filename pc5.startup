@@ -1,0 +1,22 @@
+
+# Set interface up
+ip link set dev eth0 up
+
+# Ask for ip address
+dhclient eth0
+
+# Start Openvpn if and only if the router1 is reachable
+while true 
+do
+
+  if ping -c1 -w3 154.73.45.38 >/dev/null 2>&1
+  then
+    echo "154.73.45.38 is reachable"
+    break
+  else
+    continue
+  fi
+
+done
+
+service openvpn start

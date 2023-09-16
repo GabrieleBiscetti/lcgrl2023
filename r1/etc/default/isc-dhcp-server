@@ -1,0 +1,11 @@
+###############################
+#                             #
+#  MY SIMPLE ISC-DHCP CONFIG  #
+#                             #
+###############################
+
+DHCPDv4_CONF=/etc/dhcp/dhcpd.conf
+DHCPDv4_PID=/var/run/dhcpd.pid
+
+INTERFACESv4="eth0 eth1 eth2.50"
+INTERFACESv6=""

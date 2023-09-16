@@ -1,0 +1,18 @@
+
+# Set interface up
+ip link set dev eth0 up
+
+# Set static ip
+ip address add 172.16.6.10/24 dev eth0
+
+# Set default via
+ip route add default via 172.16.6.1
+
+# Start bind9 name server
+service named start
+
+# Set root password
+echo "root:lcgrl" | chpasswd
+
+# Start ssh service
+service ssh start

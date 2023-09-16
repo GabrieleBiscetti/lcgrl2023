@@ -1,0 +1,28 @@
+services:
+  router:
+    image: kathara/quagga:router
+    container_name: router
+    build: ./docker/router/
+  endpoint:
+    image: debian:endpoint
+    container_name: endpoint
+    build: ./docker/endpoint/
+  ssh-server:
+    depends_on:
+      - endpoint
+    image: debian:ssh-server
+    container_name: ssh-server
+    build: ./docker/ssh-server/ 
+  web-server:
+    depends_on:
+      - ssh-server
+    image: debian:web-server
+    container_name: web-server
+    build: ./docker/web-server/
+  name-server:
+    depends_on:
+      - ssh-server
+    image: debian:name-server
+    container_name: name-server
+    build: ./docker/name-server/
+  

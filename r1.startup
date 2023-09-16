@@ -1,0 +1,300 @@
+
+# Set up interfaces
+ip link set eth0 up
+ip link set eth1 up
+ip link set eth2 up
+ip link set eth3 up
+#ip link set eth4 up
+#ip link set eth5 up
+
+# Set link on vlan50
+ip link add link eth2 name eth2.50 type vlan id 50
+ip link set dev eth2.50 up
+
+# Set static ip for all interfaces
+ip address add 172.16.0.1/24 dev eth0
+ip address add 172.16.2.1/24 dev eth1
+ip address add 172.16.4.1/24 dev eth2.50
+ip address add 172.16.6.1/24 dev eth3
+#ip address add 154.73.45.38/30 dev eth4
+#ip address add 46.31.161.218/30 dev eth5
+
+##########################
+#                        #
+#  DYNAMIC ROUTING OSPF  #
+#                        #
+##########################
+
+# Set file permissions 
+chown quagga:quagga /etc/quagga/*.conf 
+
+# Start quagga service
+/etc/init.d/quagga start
+
+#############################
+#                           #  
+#       STATIC ROUTING      #
+#                           #
+#############################
+
+# ip route add default via 46.31.161.217 dev eth5
+
+#############################
+#                           #  
+#   POLICY BASE ROUTING     #
+#                           #
+#############################
+
+# Define new routing table
+echo "200 DMZ-TABLE" >> /etc/iproute2/rt_tables
+
+# DMZ-TABLE default via
+ip route add default via 154.73.45.37 dev eth4 table DMZ-TABLE
+
+# All local subnets must be routed on local interfaces in DMZ-TABLE
+ip route add 172.16.0.0/24 via 172.16.0.1 dev eth0 table DMZ-TABLE
+ip route add 172.16.2.0/24 via 172.16.2.1 dev eth1 table DMZ-TABLE
+ip route add 172.16.4.0/24 via 172.16.4.1 dev eth2.50 table DMZ-TABLE
+ip route add 172.16.6.0/24 via 172.16.6.1 dev eth3 table DMZ-TABLE
+
+# The ip rule to lookup DMZ-TABLE
+ip rule add iif eth3 pri 32765 table DMZ-TABLE
+
+###################
+#                 #
+#    IPTABLES     #
+#                 #
+###################
+
+################
+# FILTER TABLE #
+################
+
+# Permit ospf
+iptables -A INPUT -i eth4 -p ospf -m state --state NEW -j ACCEPT
+iptables -A INPUT -i eth5 -p ospf -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth4 -p ospf -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth5 -p ospf -m state --state NEW -j ACCEPT
+
+# Requirements: 19g,19h
+iptables -A INPUT -i eth4 -p udp --dport 1194 -m state --state NEW -j ACCEPT
+iptables -A INPUT -i eth4 -p icmp --icmp-type 8 -m limit --limit 2/sec -j ACCEPT
+iptables -A INPUT -i eth5 -p icmp --icmp-type 8 -m limit --limit 2/sec -j ACCEPT
+iptables -A INPUT -i tun0 -p icmp --icmp-type 8 -m limit --limit 2/sec -j ACCEPT
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Extra: this open ssh access to enterprise network
+iptables -A INPUT -i eth0 -p tcp --dport 22 -m state --state NEW -j ACCEPT
+
+iptables -A INPUT -j DROP
+
+# Requirements: 19a-19f
+iptables -A FORWARD -i eth0 -o eth3 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth0 -d 172.16.0.12/32 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth2.50 -o eth0 -d 172.16.0.11/32 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth2.50 -o eth3 -d 172.16.6.10/32 -m state --state NEW -j ACCEPT
+
+iptables -A FORWARD -i eth0 -s 172.16.0.0/24 -o eth5 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth1 -s 172.16.2.0/24 -o eth5 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth2.50 -s 172.16.4.0/24 -o eth5 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth3 -s 172.16.6.0/24 -o eth4 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth4 -o eth3 -d 172.16.6.11/32 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth4 -o eth3 -d 172.16.6.12/32 -m state --state NEW -j ACCEPT
+
+# Requirements: 19i-19j
+iptables -A FORWARD -i tun0 -s 192.168.10.0/24 -o eth0 -d 172.16.0.0/24 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i eth0 -s 172.16.0.0/24 -o tun0 -d 192.168.10.0/24 -m state --state NEW -j ACCEPT
+iptables -A FORWARD -i tun0 -s 192.168.10.0/24 -o eth3 -d 172.16.6.0/24 -m state --state NEW -j ACCEPT
+
+# EXTRA RULE : Permit dns queries from guest network to ns.azienda.net.
+# This is useful to resolv record like tv.azienda.net
+iptables -A FORWARD -i eth1 -s 172.16.2.0/24 -o eth3 -d 172.16.6.10/32 -p udp --dport 53 -m state --state NEW -j ACCEPT
+
+iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -j DROP
+
+#############
+# NAT TABLE #
+#############
+
+# Requirements: 19l
+iptables -t nat -A POSTROUTING -o eth4 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o eth5 -j MASQUERADE
+
+
+# Requirements: 19k
+# Another way is use Random balanging with -m statistic --mode random --probability .5
+# In general, it works but there are problems with stateful protocol like TLS
+
+#iptables -t nat -A PREROUTING -i eth4 -d 154.73.45.38/32 \
+#         -p tcp --dport 80 \
+#         -m state --state NEW \
+#         -j DNAT --to 172.16.6.11:80
+
+# For TESTING 
+#iptables -t nat -A PREROUTING -i eth4 -d 154.73.45.38/32 \
+#         -p tcp --dport 443 \
+#         -m state --state NEW \
+#         -j DNAT --to 172.16.6.11:443
+
+#iptables -t nat -A PREROUTING -i eth4 -d 154.73.45.38/32 \
+#         -p tcp --dport 80 \
+#         -m state --state NEW \
+#         -m statistic --mode nth --every 2 --packet 0 \
+#         -j DNAT --to 172.16.6.11:80
+
+#iptables -t nat -A PREROUTING -i eth4 -d 154.73.45.38/32 \
+#         -p tcp --dport 80 \
+#         -m state --state NEW \
+#         -m statistic --mode nth --every 1 --packet 0 \
+#         -j DNAT --to 172.16.6.12:80
+
+iptables -t nat -A PREROUTING -i eth4 -d 154.73.45.38/32 \
+         -p tcp --dport 443 \
+         -m state --state NEW \
+         -m statistic --mode nth --every 2 --packet 0 \
+         -j DNAT --to 172.16.6.11:443
+
+iptables -t nat -A PREROUTING -i eth4 -d 154.73.45.38/32 \
+         -p tcp --dport 443 \
+         -m state --state NEW \
+         -m statistic --mode nth --every 1 --packet 0 \
+         -j DNAT --to 172.16.6.12:443
+
+# REMEMBER !!! It is possible to restore rules with:
+#     iptables-restore /root/iptables.rules
+
+
+
+###########################
+#                         #
+# TRAFFIC CONTROL SECTION #
+#                         #
+###########################
+
+# NOTE: we use firewall MARK target + fw filter of tc to achieve a simple configuration 
+
+# Useful commands to test the traffic control requirements
+
+# Show classes on specific device
+# tc -s -g class show dev ethX
+
+# Enable server listeing
+# iperf3 -s -p 8000 -D 
+
+# Connect client to specific serveri (-R for reverse mode)
+# iperf3 -c SERVER_IP -p 8000
+
+####################
+# Requirements 21a #
+####################
+
+# From "https://upload.wikimedia.org/wikipedia/commons/3/37/Netfilter-packet-flow.svg"
+# we see that tc work after all iptables hook points (chains implemented by tables). In particular, after the POSTROUTING
+# chain in the nat table. So there is no way to distinguish packets after the NAT traslation.
+# The only way to identify packets from LAN2 and LAN3 across ISP2 is to mark them with the iptables MARK target
+# All implementations are inspired by LARTC 15.10 section
+
+iptables -t mangle -A FORWARD -i eth1     -o eth5  -j MARK --set-mark 2
+iptables -t mangle -A FORWARD -i eth1     -o eth5  -j RETURN
+
+iptables -t mangle -A FORWARD -i eth2.50  -o eth5  -j MARK --set-mark 3
+iptables -t mangle -A FORWARD -i eth2.50  -o eth5  -j RETURN
+
+# Add a HTB qdisc attached to the device eth5 (egress to ISP2)
+tc qdisc add dev eth5 root handle 1:0 htb
+
+# Define class
+tc class add dev eth5 classid 1:300 parent 1:0 htb rate 10mbit ceil 10mbit burst 1Mbit cburst 1Mbit
+
+# Define the filter (LAN2 is marked with 2 and LAN3 is marked with 3)
+tc filter add dev eth5 protocol ip parent 1:0 prio 1 handle 2 fw classid 1:300
+tc filter add dev eth5 protocol ip parent 1:0 prio 1 handle 3 fw classid 1:300
+
+####################
+# Requirements 21b #
+####################
+
+iptables -t mangle -A FORWARD -i eth5 -o eth1 -j MARK --set-mark 4
+iptables -t mangle -A FORWARD -i eth5 -o eth1 -j RETURN
+tc qdisc add dev eth1 root handle 1:0 htb
+tc class add dev eth1 classid 1:1 parent 1:0 htb rate 10mbit ceil 10mbit burst 1Mbit cburst 1Mbit
+tc filter add dev eth1 protocol ip parent 1:0 prio 1 handle 4 fw classid 1:1
+
+####################
+# Requirements 21c #
+####################
+
+iptables -t mangle -A FORWARD -i eth5 -o eth2.50 -j MARK --set-mark 5
+iptables -t mangle -A FORWARD -i eth5 -o eth2.50 -j RETURN
+tc qdisc add dev eth2.50 root handle 1:0 htb
+tc class add dev eth2.50 classid 1:1 parent 1:0 htb rate 10mbit ceil 10mbit burst 1Mbit cburst 1Mbit
+tc filter add dev eth2.50 protocol ip parent 1:0 prio 1 handle 5 fw classid 1:1
+
+
+####################
+# Requirements 21d #
+####################
+
+# From LAN1 TO ISP2 (EXIT)
+
+# Useful also for requirement 21e
+for i in $(seq 2 254); do
+  iptables -t mangle -A FORWARD -i eth0 -s 172.16.0.$i/32 -o eth5 -j MARK --set-mark 8$i
+  iptables -t mangle -A FORWARD -i eth0 -s 172.16.0.$i/32 -o eth5 -j RETURN
+done
+
+tc class add dev eth5 classid 1:1 parent 1:0 htb rate 100mbit ceil 100mbit burst 1Mbit cburst 1Mbit
+
+for i in $(seq 2 254); do
+  tc filter add dev eth5 protocol ip parent 1:0 prio 1 handle 8$i fw classid 1:1
+done
+
+#iptables -t mangle -A FORWARD -i eth0 -o eth5 -j MARK --set-mark 9
+#tc filter add dev eth5 protocol ip parent 1:0 prio 1 handle 9 fw classid 1:1
+
+# Exit from LAN1
+iptables -t mangle -A FORWARD -o eth0 -j MARK --set-mark 6
+iptables -t mangle -A FORWARD -o eth0 -j RETURN
+tc qdisc add dev eth0 root handle 1:0 htb
+tc class add dev eth0 classid 1:1 parent 1:0 htb rate 100mbit ceil 100mbit burst 1Mbit cburst 1Mbit
+tc filter add dev eth0 protocol ip parent 1:0 prio 1 handle 6 fw classid 1:1
+
+
+####################
+# Requirements 21e #
+####################
+
+# FROM: https://serverfault.com/questions/833862/how-to-limit-speed-for-every-device-per-mac-address-in-the-gateway-via-linux-com
+
+# EXIT from LAN1 to Single LAN1 device
+for i in $(seq 2 254); do
+  tc class add dev eth0 classid 1:$i parent 1:1 htb rate 20mbit ceil 40mbit burst 1Mbit cburst 1Mbit
+  tc filter add dev eth0 protocol ip parent 1:1 prio 1 u32 match ip dst 172.16.0.$i/32 classid 1:$i
+done
+
+# From LAN1 single device TO ISP2 (EXIT) 
+for i in $(seq 2 254); do
+  tc class add dev eth5 classid 1:$i parent 1:1 htb rate 20mbit ceil 40mbit burst 1Mbit cburst 1Mbit
+  tc filter add dev eth5 protocol ip parent 1:1 prio 1 handle 8$i fw flowid 1:$i
+done
+
+#############
+# Services  #
+#############
+
+# DHCP
+service isc-dhcp-server start
+
+# SSH
+echo "root:lcgrl" | chpasswd
+service ssh start
+
+# OPENVPN
+touch /var/log/openvpn/openvpn-status.log
+service openvpn start
+
+# EASY-RSA
+ln -s /usr/share/easy-rsa/x509-types /root/easy-rsa/x509-types
+ln -s /usr/share/easy-rsa/easyrsa /root/easy-rsa/easyrsa
+

@@ -1,0 +1,10 @@
+
+# Set static mac-address
+ip link set dev eth0 address 00:23:C2:72:1C:6A
+
+# Set interface up
+ip link set dev eth0 up
+
+# Ask for ip address and start apache after
+dhclient eth0 && service apache2 start
+dhclient eth0

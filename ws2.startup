@@ -1,0 +1,26 @@
+
+# Set interface up
+ip link set dev eth0 up
+
+# Set static ip
+ip address add 172.16.6.12/24 dev eth0
+
+# Set default via
+ip route add default via 172.16.6.1
+
+#####################
+# Apache web server #
+#####################
+echo 'ServerName 127.0.0.1' >> /etc/apache2/apache2.conf
+
+# Enable modules
+a2enmod ssl
+a2enmod auth_digest
+
+# Enable sites
+a2ensite azienda.net.conf
+a2ensite hosted.net.conf
+a2ensite default-ssl.conf
+
+# Start the service
+service apache2 start

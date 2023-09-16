@@ -1,0 +1,9 @@
+
+# Set static mac-address
+ip link set dev eth0 address 18:66:DA:34:29:25
+
+# Set interface up
+ip link set dev eth0 up
+
+# Ask for ip address and start openssh-server
+dhclient eth0 && service ssh start

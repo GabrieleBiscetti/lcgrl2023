@@ -1,0 +1,46 @@
+
+# Set up interfaces
+#ip link set eth0 up
+#ip link set eth1 up
+#ip link set eth2 up
+
+# Set static ip for all interfaces
+#ip address add 193.3.50.1/30 dev eth0 
+#ip address add 194.63.146.1/30 dev eth1
+#ip address add 9.0.0.1/30 dev eth2
+
+##########################
+#                        #
+#  DYNAMIC ROUTING OSPF  #
+#                        #
+##########################
+
+# Set file permissions 
+chown quagga:quagga /etc/quagga/*.conf 
+
+# Start quagga service
+/etc/init.d/quagga start
+
+######################
+#                    #
+#  STATIC ROUTING    #
+#                    #
+######################
+
+#ip route add 46.31.161.216/30 via 194.63.146.2 dev eth1 
+#ip route add 154.73.45.36/30 via 193.3.50.2 dev eth0
+
+######################
+#                    #
+#     IPTABLES       #
+#                    #
+######################
+
+# FILTER TABLE
+#iptables -A FORWARD -i eth2 -s 9.0.0.2 -j ACCEPT
+#iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+#iptables -A FORWARD -j DROP
+
+# NAT TABLE
+iptables -t nat -I POSTROUTING -o eth3 -j MASQUERADE
+

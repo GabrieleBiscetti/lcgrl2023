@@ -1,0 +1,2 @@
+# Set local and remote ip for the pointopoint tun device
+ifconfig-push 192.168.10.51 192.168.10.52

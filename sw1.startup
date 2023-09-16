@@ -1,0 +1,14 @@
+ip link set dev eth0 up
+ip link set dev eth1 up
+
+ip link add link eth1 name eth1.50 type vlan id 50
+ip link set dev eth1.50 up
+
+ip link add br50 type bridge
+ip link set dev br50 up
+
+ip link set eth0 master br50
+ip link set eth1.50 master br50
+
+# Switch management interface on vlan50
+ip address add 172.16.4.2/24 dev br50

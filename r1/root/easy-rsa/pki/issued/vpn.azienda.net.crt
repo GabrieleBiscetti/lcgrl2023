@@ -1,0 +1,87 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            41:59:ee:b3:c4:9b:ad:dc:87:25:8e:5e:ca:99:db:1b
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=ca.azienda.net
+        Validity
+            Not Before: Aug 16 13:53:11 2023 GMT
+            Not After : Jul 31 13:53:11 2026 GMT
+        Subject: CN=vpn.azienda.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:d5:2c:d2:34:7a:26:2a:28:94:93:85:4c:3e:86:
+                    a6:3e:f6:4f:bf:bb:cf:05:df:30:3a:3f:38:8c:82:
+                    2b:d5:50:90:42:3b:99:05:03:7e:04:24:95:64:ca:
+                    05:c0:92:74:3e:7f:f8:da:38:4f:3b:f4:5a:f7:07:
+                    f8:3b:d5:68:50:cd:8c:d4:34:ea:d7:cc:11:37:d8:
+                    79:f3:fa:68:42:37:0f:ed:1e:79:cd:a7:b1:90:5a:
+                    bf:89:00:a2:78:1b:41:5a:03:26:ec:92:08:ad:40:
+                    c1:01:1c:b1:03:4b:02:3c:ed:2b:21:ef:37:bd:12:
+                    29:b2:b2:26:84:4a:b7:4f:25:3c:ae:85:df:6f:06:
+                    c4:68:36:27:f9:75:b3:a5:7b:ba:14:a6:56:b4:59:
+                    84:be:5b:3a:d9:04:aa:76:fd:a3:f4:11:3e:59:d7:
+                    c4:2a:3b:0f:90:83:6b:a6:43:e7:db:82:9b:4e:2f:
+                    6f:97:1a:76:07:ae:b2:ca:52:91:d5:5c:1b:85:92:
+                    1a:dd:bc:03:55:00:87:39:99:03:34:59:11:1b:82:
+                    96:32:e0:b0:3f:05:1d:9d:a7:c6:e7:f4:ba:6c:ce:
+                    f5:c7:7e:3b:86:61:ee:8e:36:ce:e7:5a:f2:e3:24:
+                    69:0f:4f:bc:b4:b0:87:b5:78:79:8c:fb:24:3b:34:
+                    68:0f
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Subject Key Identifier: 
+                11:76:8C:5B:62:73:05:2F:72:16:D4:05:53:E2:42:AB:09:0E:1E:57
+            X509v3 Authority Key Identifier: 
+                keyid:B6:8F:FB:F0:B1:EF:99:E6:E2:EA:7D:16:6D:32:F3:9D:50:6B:12:16
+                DirName:/CN=ca.azienda.net
+                serial:6A:C3:42:DF:45:D4:A8:F3:87:3C:8F:6F:4C:EE:BC:8C:84:83:83:26
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+            X509v3 Subject Alternative Name: 
+                DNS:vpn.azienda.net
+    Signature Algorithm: sha256WithRSAEncryption
+         25:28:05:de:1b:09:54:6b:98:b3:14:4d:2e:c0:eb:14:40:30:
+         2a:75:4c:5d:b9:26:4b:66:e9:76:d3:ce:84:0e:8b:5a:a4:ce:
+         15:85:59:53:86:bb:f0:be:f4:c8:29:6c:af:9b:3b:a7:a9:67:
+         07:c9:fe:4c:70:72:47:74:b8:1f:70:56:cf:23:8a:f7:12:47:
+         4e:d8:cf:ee:f1:6b:bf:bb:88:0f:5f:10:c0:8a:46:55:59:3b:
+         74:c5:6b:de:d5:25:e3:4c:b1:4e:ee:b6:f4:0a:8f:28:af:e5:
+         dd:06:34:6e:e1:ec:bc:9c:88:b2:3f:23:1f:c0:30:25:38:82:
+         b7:83:74:4f:9a:91:53:10:7f:bc:0f:93:b0:2a:2b:12:2e:35:
+         1b:03:50:7c:bf:b2:5d:a3:0d:33:cc:e3:15:20:26:f7:7d:7a:
+         02:6c:c3:54:a2:ae:cb:3c:52:43:e1:f4:be:76:ef:11:10:6d:
+         69:f5:44:77:41:52:ca:02:ae:8d:a5:c1:9f:76:7e:0a:ab:a3:
+         4c:bb:de:44:36:ff:74:76:86:d0:6d:67:49:c0:2f:64:5d:2b:
+         55:9d:78:d0:1c:57:7e:40:6a:2d:5f:cc:66:53:fa:b3:c8:8b:
+         7a:59:86:17:01:54:79:43:32:5d:5a:98:8d:32:62:4a:f2:56:
+         c6:13:3d:28
+-----BEGIN CERTIFICATE-----
+MIIDfzCCAmegAwIBAgIQQVnus8SbrdyHJY5eypnbGzANBgkqhkiG9w0BAQsFADAZ
+MRcwFQYDVQQDDA5jYS5hemllbmRhLm5ldDAeFw0yMzA4MTYxMzUzMTFaFw0yNjA3
+MzExMzUzMTFaMBoxGDAWBgNVBAMMD3Zwbi5hemllbmRhLm5ldDCCASIwDQYJKoZI
+hvcNAQEBBQADggEPADCCAQoCggEBANUs0jR6JioolJOFTD6Gpj72T7+7zwXfMDo/
+OIyCK9VQkEI7mQUDfgQklWTKBcCSdD5/+No4Tzv0WvcH+DvVaFDNjNQ06tfMETfY
+efP6aEI3D+0eec2nsZBav4kAongbQVoDJuySCK1AwQEcsQNLAjztKyHvN70SKbKy
+JoRKt08lPK6F328GxGg2J/l1s6V7uhSmVrRZhL5bOtkEqnb9o/QRPlnXxCo7D5CD
+a6ZD59uCm04vb5cadgeusspSkdVcG4WSGt28A1UAhzmZAzRZERuCljLgsD8FHZ2n
+xuf0umzO9cd+O4Zh7o42zuda8uMkaQ9PvLSwh7V4eYz7JDs0aA8CAwEAAaOBwTCB
+vjAJBgNVHRMEAjAAMB0GA1UdDgQWBBQRdoxbYnMFL3IW1AVT4kKrCQ4eVzBUBgNV
+HSMETTBLgBS2j/vwse+Z5uLqfRZtMvOdUGsSFqEdpBswGTEXMBUGA1UEAwwOY2Eu
+YXppZW5kYS5uZXSCFGrDQt9F1KjzhzyPb0zuvIyEg4MmMBMGA1UdJQQMMAoGCCsG
+AQUFBwMBMAsGA1UdDwQEAwIFoDAaBgNVHREEEzARgg92cG4uYXppZW5kYS5uZXQw
+DQYJKoZIhvcNAQELBQADggEBACUoBd4bCVRrmLMUTS7A6xRAMCp1TF25Jktm6XbT
+zoQOi1qkzhWFWVOGu/C+9MgpbK+bO6epZwfJ/kxwckd0uB9wVs8jivcSR07Yz+7x
+a7+7iA9fEMCKRlVZO3TFa97VJeNMsU7utvQKjyiv5d0GNG7h7LyciLI/Ix/AMCU4
+greDdE+akVMQf7wPk7AqKxIuNRsDUHy/sl2jDTPM4xUgJvd9egJsw1Sirss8UkPh
+9L527xEQbWn1RHdBUsoCro2lwZ92fgqro0y73kQ2/3R2htBtZ0nAL2RdK1WdeNAc
+V35Aai1fzGZT+rPIi3pZhhcBVHlDMl1amI0yYkryVsYTPSg=
+-----END CERTIFICATE-----
