@@ -7,4 +7,3 @@ ip link set dev eth0 up
 
 # Ask for ip address and start apache after
 dhclient eth0 && service apache2 start
-dhclient eth0
